@@ -1,7 +1,7 @@
 use plotters::prelude::*;
 
 const YEARS: u64 = 20;
-const REDELEGATIONS_PER_YEAR: u64 = 100;
+const REDELEGATIONS_PER_YEAR: u64 = 1;
 const STAKING_RATE: f64 = 0.7;
 
 struct Period {
@@ -14,8 +14,12 @@ struct Period {
 }
 
 fn redelegate(i: u64, last_period: Period) -> Period {
-    let effective_inflation: f64 = last_period.inflation_rate / REDELEGATIONS_PER_YEAR as f64;
+    let effective_inflation: f64 = (last_period.inflation_rate
+        - ((i as f64 * 0.01) / REDELEGATIONS_PER_YEAR as f64))
+        / REDELEGATIONS_PER_YEAR as f64;
+
     let staking_rewards = last_period.total_tokens * STAKING_RATE * effective_inflation;
+
     let staking_rewards_delegated_dev_slice = (last_period
         .total_tokens_created_from_delegated_dev_slice
         + last_period.total_tokens_created_dev_slice)
